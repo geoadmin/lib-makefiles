@@ -26,15 +26,10 @@ define dockerhelp
 	$(shell echo "Same function as dockerbuild, but it will run the images in containers.")
 	$(shell echo "dockerpurge : called with $$(call dockerpurge, [image_name]")
 	$(shell echo "it will remove all containers running and images whose image name")
-	$(shell echo "are swisstopo/[image_name] with either the dev, int or prod tag.")
+	$(shell echo "are swisstopo/[image_name] with any tag.")
 	$(shell echo "dockerpush: called with $$(call dockerpush, [image_name],[tag])")
 	$(shell echo "will push to the swisstopo dockerhub the swisstopo/[image_name]:[tag] image.")
 	$(shell echo "dockerdeploy: called with call $$(call dockerdeploy, [dev | int | prod], [mako_cmd], [image_base_name])")
-	$(shell echo "")
-	$(shell echo "")
-	$(shell echo "")
-	$(shell echo "")
-	$(shell echo "")
 
 endef
 
@@ -52,22 +47,22 @@ endef
 
 
 define dockerpurge
-	@if test "$(shell sudo docker ps --filter "ancestor=swisstopo/${1}:latest" --filter "ancestor=swisstopo/${1}:dev" --filter "ancestor=swisstopo/${1}:int" --filter "ancestor=swisstopo/${1}:prod"  -a -q)" != "": then \
-		sudo docker rm -f $(shell sudo docker ps --filter "ancestor=swisstopo/${1}:latest" --filter "ancestor=swisstopo/${1}:dev" --filter "ancestor=swisstopo/${1}:int" --filter "ancestor=swisstopo/${1}:prod"  -a -q); \
-	fi
-
-	@if test "$(shell sudo docker images swisstopo/${1} -q)" != ""; then \
-		sudo docker rmi -f $(shell sudo docker images swisstopo/${1} -q); \
-	fi
-
+	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" )
+	for line in $(images); do \
+		@if test "$(shell sudo docker ps --filter "ancestor=${line}" -a -q)" != ""; then \
+			$(shell sudo docker fm -f $(shell sudo docker ps --filter "ancestor=${line}" -a -q))
+		fi
+	$(shell sudo docker rmi -f $(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" ))
+		$(shell echo ${line}); \
+	done;
 endef
 
 define dockerpush
 
 	@if test "$(shell sudo docker images swisstopo/${1}:${2})" != ""; then \
 		docker push swisstopo/${1}:${2} ; \
-	else
-		echo "NOPE"; \
+	else \
+		echo "The image swisstopo/${1}:${2} doesn't seem to exist."; \
 	fi
 endef
 
@@ -92,7 +87,7 @@ define dockerdeploy
 
 	$(call dockerpurge, ${3}) 
 	$(call dockerbuild, ${1}, ${2}, ${3})
-	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}")
+	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}" | awk '{print $$1}')
 	for line in $(images); do \
 	$(shell docker tag ${line} ${line}_$(shell date +%Y_%m_%d)) ; \
 	$(call dockerpush, ${3}, ${1}_$(shell date +%Y_%m_%d)) ; \
