@@ -34,10 +34,10 @@ endef
 
 define dockerpurge
 	for line in $(shell docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
-		@if test "$(shell sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then \
-			$(shell sudo docker rm -f $(shell sudo docker ps --filter "ancestor=$$line" -a -q))
+		@if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then \
+			$$(sudo docker rm -f $$( sudo docker ps --filter "ancestor=$$line" -a -q))
 		fi
-	$(shell sudo docker rmi -f $$line)
+	$$(sudo docker rmi -f $$line)
 	done;
 endef
 
@@ -54,7 +54,7 @@ define dockerdeploy
 	$(call dockerbuild, ${1}, ${2}, ${3})
 	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}")
 	for line in $(images); do \
-	$(shell docker tag $$line $$line_$(shell date +%Y_%m_%d)) ; \
+	$$(docker tag $$line $$line_$(shell date +%Y_%m_%d)) ; \
 	$(call dockerpush, ${3}, ${1}_$(shell date +%Y_%m_%d)) ; \
 	done ;
 endef
