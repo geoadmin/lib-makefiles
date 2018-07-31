@@ -30,19 +30,14 @@ define dockerhelp
 	$(shell echo "dockerpush: called with $$(call dockerpush, [image_name],[tag])")
 	$(shell echo "will push to the swisstopo dockerhub the swisstopo/[image_name]:[tag] image.")
 	$(shell echo "dockerdeploy: called with call $$(call dockerdeploy, [dev | int | prod], [mako_cmd], [image_base_name])")
-
 endef
 
 define dockerbuild
-
 	$(call docker-compose.yml, ${1}, false, ${2}, ${3}) && $(shell docker-compose build)
-
 endef
 
 define dockerrun
-
 	$(call docker-compose.yml, ${1}, false, ${2}, ${3}) && $(shell docker-compose up -d)
-
 endef
 
 
@@ -58,7 +53,6 @@ define dockerpurge
 endef
 
 define dockerpush
-
 	@if test "$(shell sudo docker images swisstopo/${1}:${2})" != ""; then \
 		docker push swisstopo/${1}:${2} ; \
 	else \
@@ -73,18 +67,11 @@ endef
 # same nomenclature to call all your needed env files. All the necessary variables to use in your \
 # docker-compose should be in your .env file. That way, we have a simple clean unique function. \
 # please ? 
-
-
-
 define docker-compose.yml
-
 	${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "staging=${1}" --var "image_base_name=swisstopo/${4}" > docker-compose.yml
-
 endef
 
-#TODO: purge all images that have a certain name. Can we discover that name without having to specify it directly. 
 define dockerdeploy
-
 	$(call dockerpurge, ${3}) 
 	$(call dockerbuild, ${1}, ${2}, ${3})
 	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}" | awk '{print $$1}')
