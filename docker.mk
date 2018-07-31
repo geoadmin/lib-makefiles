@@ -42,6 +42,8 @@ define dockerpurge
 	done;
 endef
 
+
+#TODO: generalization for docker push
 define dockerpush
 	@if test "$(shell sudo docker images swisstopo/${1}:${2})" != ""; then \
 		docker push swisstopo/${1}:${2} ; \

@@ -2,6 +2,7 @@ include ./docker.mk
 SHELL:=/bin/bash
 VENV:=.venv
 MAKO_CMD:=${VENV}/bin/mako-render
+PROJECT_NAME:=sample_name
 
 test:
 	$(call fct)
@@ -10,19 +11,19 @@ help:
 	$(call dockerhelp)
 
 docker-buid-%:
-	$(call dockerbuild, $*, $MAKO_CMD, sample_name)
+	$(call dockerbuild, $*, $MAKO_CMD, $PROJECT_NAME)
 
 docker-run-%:
-	$(call dockerrun, $*, $MAKO_CMD, sample_name)
+	$(call dockerrun, $*, $MAKO_CMD, $PROJECT_NAME)
 
 docker-purge:
-	$(call dockerpurge, sample_name)
+	$(call dockerpurge, $PROJECT_NAME)
 
 docker-push-%:
-	$(call dockerpush, sample_name, $*)
+	$(call dockerpush, $PROJECT_NAME, $*)
 
 docker-deploy-%:
-	$(call dockerdeploy, $*, $MAKO_CMD, sample_name)
+	$(call dockerdeploy, $*, $MAKO_CMD, $PROJECT_NAME)
 
 define fct
 	for line in $(shell sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo"); do \
