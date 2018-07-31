@@ -1,19 +1,10 @@
 SHELL = /bin/bash
 
-#$1 is the staging environment (dev int prod), $2 is the mako command used, $3 is the image name
-
 # Author: Martin Kunzi\
 Using this library: \
 Step 1: include the library inside your own make file.\
 Step 2: Call the desired functions \
 Steo 3; Profit\
-\
-\
-\
-\
-\
-\
-\
 
 define dockerhelp
 	$(shell echo "The goal of this library is to provide functions to harmonize and ease the use of docker in the different swisstopo projects. This help should tell you how to use the different functions.")
@@ -42,13 +33,11 @@ endef
 
 
 define dockerpurge
-	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" )
-	for line in $(images); do \
-		@if test "$(shell sudo docker ps --filter "ancestor=${line}" -a -q)" != ""; then \
-			$(shell sudo docker fm -f $(shell sudo docker ps --filter "ancestor=${line}" -a -q))
+	for line in $(shell docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
+		@if test "$(shell sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then \
+			$(shell sudo docker rm -f $(shell sudo docker ps --filter "ancestor=$$line" -a -q))
 		fi
-	$(shell sudo docker rmi -f $(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" ))
-		$(shell echo ${line}); \
+	$(shell sudo docker rmi -f $$line)
 	done;
 endef
 
@@ -60,6 +49,16 @@ define dockerpush
 	fi
 endef
 
+define dockerdeploy
+	$(call dockerpurge, ${3}) 
+	$(call dockerbuild, ${1}, ${2}, ${3})
+	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}")
+	for line in $(images); do \
+	$(shell docker tag $$line $$line_$(shell date +%Y_%m_%d)) ; \
+	$(call dockerpush, ${3}, ${1}_$(shell date +%Y_%m_%d)) ; \
+	done ;
+endef
+
 # $1 is the environment (dev, int, prod) and $2 is the base name of the image built \
 # $3 is the MAKO COMMAND\
 # How to use : the env file in (usually) ${1}.env and should be specified in the docker-compose \
@@ -68,15 +67,6 @@ endef
 # docker-compose should be in your .env file. That way, we have a simple clean unique function. \
 # please ? 
 define docker-compose.yml
-	${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "staging=${1}" --var "image_base_name=swisstopo/${4}" > docker-compose.yml
+        ${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "staging=${1}" --var "image_base_name=swisstopo/${4}" > docker-compose.yml
 endef
 
-define dockerdeploy
-	$(call dockerpurge, ${3}) 
-	$(call dockerbuild, ${1}, ${2}, ${3})
-	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}" | awk '{print $$1}')
-	for line in $(images); do \
-	$(shell docker tag ${line} ${line}_$(shell date +%Y_%m_%d)) ; \
-	$(call dockerpush, ${3}, ${1}_$(shell date +%Y_%m_%d)) ; \
-	done ;
-endef
