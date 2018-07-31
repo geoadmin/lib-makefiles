@@ -1,0 +1,34 @@
+include ./docker.mk
+SHELL:=/bin/bash
+VENV:=.venv
+MAKO_CMD:=${VENV}/bin/mako-render
+
+test:
+	$(call fct)
+
+help:
+	$(call dockerhelp)
+
+docker-buid-%:
+	$(call dockerbuild, $*, $MAKO_CMD, sample_name)
+
+docker-run-%:
+	$(call dockerrun, $*, $MAKO_CMD, sample_name)
+
+docker-purge:
+	$(call dockerpurge, sample_name)
+
+docker-push-%:
+	$(call dockerpush, sample_name, $*)
+
+docker-deploy-%:
+	$(call dockerdeploy, $*, $MAKO_CMD, sample_name)
+
+define fct
+	for line in $(shell sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo"); do \
+		echo $$(sudo docker ps --filter "ancestor=$$line" -a --format "{{.ID}} : {{.Image}} : {{.Names}}");\
+	done; 
+endef
+
+
+
