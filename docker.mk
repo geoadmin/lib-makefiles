@@ -7,20 +7,21 @@ Step 2: Call the desired functions \
 Steo 3; Profit\
 
 define dockerhelp
-	$(shell echo "The goal of this library is to provide functions to harmonize and ease the use of docker in the different swisstopo projects. This help should tell you how to use the different functions.")
-	$(shell echo "dockerbuild : called with $$(call dockerbuild, [dev|int|prod], [mako_cmd], [image_base_name])")
-	$(shell echo "[dev|int|prod] is the staging environment. it defines both the tag of the built image and the 'staging' variable for mako to replace in your docker-compose.yml.in.")
-	$(shell echo "[mako_cmd] refers to the mako command. it is, usually, in your python virtual environment in $${python_directory}/bin/mako-render")
-	$(shell echo "[image_base_name] will give a image_base_name variable for the mako render which will be swisstopo/[image_base_name].")
-	$(shell echo "Example of use : $$(call dockerbuild, dev, .venv/bin/mako-render, service-example) could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images")
-	$(shell echo "dockerrun: called with $$(call dockerrun, [dev | int | prod], [mako_cmd], [image_base_name])")
-	$(shell echo "Same function as dockerbuild, but it will run the images in containers.")
-	$(shell echo "dockerpurge : called with $$(call dockerpurge, [image_name]")
-	$(shell echo "it will remove all containers running and images whose image name")
-	$(shell echo "are swisstopo/[image_name] with any tag.")
-	$(shell echo "dockerpush: called with $$(call dockerpush, [image_name],[tag])")
-	$(shell echo "will push to the swisstopo dockerhub the swisstopo/[image_name]:[tag] image.")
-	$(shell echo "dockerdeploy: called with call $$(call dockerdeploy, [dev | int | prod], [mako_cmd], [image_base_name])")
+
+	@echo "The goal of this library is to provide functions to harmonize and ease the use of docker in the different swisstopo projects. This help should tell you how to use the different functions."
+	@echo "dockerbuild : called with call dockerbuild, [dev|int|prod], [mako_cmd], [image_base_name]"
+	@echo "[dev|int|prod] is the staging environment. it defines both the tag of the built image and the 'staging' variable for mako to replace in your docker-compose.yml.in."
+	@echo "[mako_cmd] refers to the mako command. it is, usually, in your python virtual environment in $${python_directory}/bin/mako-render"
+	@echo "[image_base_name] will give a image_base_name variable for the mako render which will be swisstopo/[image_base_name]."
+	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example) could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
+	@echo "dockerrun: called with call dockerrun, [dev | int | prod], [mako_cmd], [image_base_name]"
+	@echo "Same function as dockerbuild, but it will run the images in containers."
+	@echo "dockerpurge : called with call dockerpurge, [image_name]"
+	@echo "it will remove all containers running and images whose image name"
+	@echo "are swisstopo/[image_name] with any tag."
+	@echo "dockerpush: called with call dockerpush, [image_name],[tag]"
+	@echo "will push to the swisstopo dockerhub the swisstopo/[image_name]:[tag] image."
+	@echo "dockerdeploy: called with call call dockerdeploy, [dev | int | prod], [mako_cmd], [image_base_name]"
 endef
 
 define dockerbuild
