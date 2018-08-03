@@ -54,7 +54,7 @@ endef
 
 #Okay, this is ugly, but it should work
 
-define dockerdeploy
+define dockerpipe
 	$(call dockerpurge, ${3}) 
 	$(call dockerbuild, ${1}, ${2}, ${3})
 	for line in $$(sudo docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}"); do \
