@@ -2,7 +2,7 @@ include ./docker.mk
 SHELL:=/bin/bash
 VENV:=.venv
 MAKO_CMD:=${VENV}/bin/mako-render
-PROJECT_NAME:=sample_name
+PROJECT_NAME:=sample_project_base_name
 
 test:
 	$(call fct)
@@ -10,24 +10,25 @@ test:
 help:
 	$(call dockerhelp)
 
+
 docker-buid-%:
-	$(call dockerbuild, $*, $MAKO_CMD, $PROJECT_NAME)
+	$(call dockerbuild,$*,${MAKO_CMD},${PROJECT_NAME})
 
 docker-run-%:
-	$(call dockerrun, $*, $MAKO_CMD, $PROJECT_NAME)
+	$(call dockerrun,$*,${MAKO_CMD},${PROJECT_NAME})
 
 docker-purge:
-	$(call dockerpurge, $PROJECT_NAME)
+	$(call dockerpurge,${PROJECT_NAME})
 
 docker-push-%:
-	$(call dockerpush, $PROJECT_NAME, $*)
+	$(call dockerpush,${PROJECT_NAME},$*)
 
 docker-deploy-%:
-	$(call dockerdeploy, $*, $MAKO_CMD, $PROJECT_NAME)
+	$(call dockerdeploy,$*,${MAKO_CMD},${PROJECT_NAME})
 
 define fct
 	for line in $(shell sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo"); do \
-		echo $$(sudo docker ps --filter "ancestor=$$line" -a --format "{{.ID}} : {{.Image}} : {{.Names}}");\
+		echo "$$line" ;\
 	done; 
 endef
 
