@@ -32,6 +32,9 @@ define dockerrun
 	$(call docker-compose.yml,${1},false,${2},${3}) && $$(sudo docker-compose up -d)
 endef
 
+define docker-clean
+	$$(sudo rm -f docker-compose.yml)
+endef
 
 define dockerpurge
 	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
