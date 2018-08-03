@@ -36,13 +36,17 @@ define docker-clean
 	$$(sudo rm -f docker-compose.yml)
 endef
 
+
+#works, but TODO: find why it tries to run [bash container_id] in addition to docker rm
+# TODO 2 : find why it is trying to run Untagged in addtion to docker rmi
 define dockerpurge
+	echo "$$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}")"
 	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
-		@if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then \
-			$$(sudo docker rm -f $$( sudo docker ps --filter "ancestor=$$line" -a -q))
-		fi
-	$$(sudo docker rmi -f $$line)
-	done;
+		if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then  \
+			$$(sudo docker rm -f "$$(sudo docker ps --filter "ancestor=$$line" -a -q)"); \
+		fi; \
+	$$(sudo docker rmi -f $$line); \
+	done
 endef
 
 
@@ -71,6 +75,7 @@ endef
 # docker-compose should be in your .env file. That way, we have a simple clean unique function. \
 # please ? 
 define docker-compose.yml
-        ${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "staging=${1}" --var "image_base_name=swisstopo/${4}" > docker-compose.yml
+	sudo echo "${3} | ${2} | ${1} | ${4}"
+        $$(sudo ${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "environment=${1}" --var "image_base_name=${4}" > docker-compose.yml)
 endef
 
