@@ -25,16 +25,16 @@ define dockerhelp
 endef
 
 define dockerbuild
-	$(call docker-compose.yml, ${1}, false, ${2}, ${3}) && $(shell docker-compose build)
+	$(call docker-compose.yml,${1},false,${2},${3}) && $$(sudo docker-compose build)
 endef
 
 define dockerrun
-	$(call docker-compose.yml, ${1}, false, ${2}, ${3}) && $(shell docker-compose up -d)
+	$(call docker-compose.yml,${1},false,${2},${3}) && $$(sudo docker-compose up -d)
 endef
 
 
 define dockerpurge
-	for line in $(shell docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
+	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
 		@if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then \
 			$$(sudo docker rm -f $$( sudo docker ps --filter "ancestor=$$line" -a -q))
 		fi
@@ -43,22 +43,20 @@ define dockerpurge
 endef
 
 
-#TODO: generalization for docker push
 define dockerpush
-	@if test "$(shell sudo docker images swisstopo/${1}:${2})" != ""; then \
-		docker push swisstopo/${1}:${2} ; \
-	else \
-		echo "The image swisstopo/${1}:${2} doesn't seem to exist."; \
-	fi
+	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" | grep ":${2}"); do \
+	$$(sudo docker push $$image);\
+	done
 endef
+
+#Okay, this is ugly, but it should work
 
 define dockerdeploy
 	$(call dockerpurge, ${3}) 
 	$(call dockerbuild, ${1}, ${2}, ${3})
-	images=$(shell docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}")
-	for line in $(images); do \
-	$$(docker tag $$line $$line_$(shell date +%Y_%m_%d)) ; \
-	$(call dockerpush, ${3}, ${1}_$(shell date +%Y_%m_%d)) ; \
+	for line in $$(sudo docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}"); do \
+	$$(sudo docker tag $$line "$$line"_$$(date +%Y_%m_%d)) ; \
+	$(call dockerpush,"$$line_"$$(date +%Y_%m_%d)","")) ; \
 	done ;
 endef
 
