@@ -4,18 +4,15 @@ VENV:=.venv
 MAKO_CMD:=${VENV}/bin/mako-render
 PROJECT_NAME:=sample_project_base_name
 
-test:
-	$(call fct)
-
 help:
 	$(call dockerhelp)
 
 
 docker-buid-%:
-	$(call dockerbuild,$*,${MAKO_CMD},${PROJECT_NAME})
+	$(call dockerbuild,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
 
 docker-run-%:
-	$(call dockerrun,$*,${MAKO_CMD},${PROJECT_NAME})
+	$(call dockerrun,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
 
 docker-purge:
 	$(call dockerpurge,${PROJECT_NAME})
@@ -23,14 +20,8 @@ docker-purge:
 docker-push-%:
 	$(call dockerpush,${PROJECT_NAME},$*)
 
-docker-deploy-%:
-	$(call dockerdeploy,$*,${MAKO_CMD},${PROJECT_NAME})
+docker-pipe-%:
+	$(call dockerpipe,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
 
-define fct
-	for line in $(shell sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo"); do \
-		echo "$$line" ;\
-	done; 
-endef
-
-
-
+clean:
+	rm -f docker-compose.yml
