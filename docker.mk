@@ -9,13 +9,13 @@ Steo 3; Profit\
 define dockerhelp
 
 	@echo "The goal of this library is to provide functions to harmonize and ease the use of docker in the different swisstopo projects. This help should tell you how to use the different functions."
-	@echo "dockerbuild : called with call dockerbuild, [dev|int|prod], [mako_cmd], [image_base_name], [continuous integration?]"
+	@echo "dockerbuild : called with call dockerbuild, [dev|int|prod], [mako_cmd], [image_base_name], [additional variables]"
 	@echo "[dev|int|prod] is the staging environment. it defines both the tag of the built image and the 'staging' variable for mako to replace in your docker-compose.yml.in."
 	@echo "[mako_cmd] refers to the mako command. it is, usually, in your python virtual environment in $${python_directory}/bin/mako-render"
 	@echo "[image_base_name] will give a image_base_name variable for the mako render which will be swisstopo/[image_base_name]."
-	@echo "[additional variables] should be a string in the following form: --var "var_name=value" --var "var_name_2=value_2" etc. The goal is to provide all variables that are specific to your project.
-	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example,--var "test=operational" --var "functional=yes") could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
-	@echo "dockerrun: called with call dockerrun, [dev | int | prod], [mako_cmd], [image_base_name]"
+	@echo "[additional variables] should be a string in the following form: --var 'var_name=value' --var 'var_name_2=value_2' etc. The goal is to provide all variables that are specific to your project. "
+	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example,--var 'ci=true') could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
+	@echo "dockerrun: called with call dockerrun, [dev | int | prod], [mako_cmd], [image_base_name], [additional variables]"
 	@echo "Same function as dockerbuild, but it will run the images in containers."
 	@echo "dockerpurge : called with call dockerpurge, [image_name]"
 	@echo "it will remove all containers running and images whose image name"
@@ -43,25 +43,25 @@ define dockerpurge
 		if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then  \
 			sudo docker rm -f "$$(sudo docker ps --filter "ancestor=$$line" -a -q)"; \
 		fi; \
-	sudo docker rmi -f $$line; \
+	sudo docker rmi -f $$line ; \
 	done
 endef
 
 
 define dockerpush
 	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" | grep ":${2}"); do \
-	sudo docker push $$image;\
+	sudo docker push $$image ; \
 	done
 endef
 
 #Okay, this is ugly, but it should work
-#         $(call dockerpush,"$$line_"$$(date +%Y_%m_%d)","")) ; \
+#         $(call dockerpush,"$$line_"$$(date +%Y_%m_%d)","")) ; 
 # nothing to see here
 
 define dockerpipe
-	$(call dockerpurge, ${3}) 
-	$(call dockerbuild, ${1}, ${2}, ${3}, ${4})
-	for line in $$(sudo docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}"); do \
+	$(call dockerpurge,${3}) 
+	$(call dockerbuild,${1},${2},${3},${4})
+	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}") ; do \
 	sudo docker tag $$line "$$line"_$$(date +%Y_%m_%d) ; \
 	done ;
 endef
