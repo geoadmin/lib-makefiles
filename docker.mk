@@ -9,11 +9,12 @@ Steo 3; Profit\
 define dockerhelp
 
 	@echo "The goal of this library is to provide functions to harmonize and ease the use of docker in the different swisstopo projects. This help should tell you how to use the different functions."
-	@echo "dockerbuild : called with call dockerbuild, [dev|int|prod], [mako_cmd], [image_base_name]"
+	@echo "dockerbuild : called with call dockerbuild, [dev|int|prod], [mako_cmd], [image_base_name], [continuous integration?]"
 	@echo "[dev|int|prod] is the staging environment. it defines both the tag of the built image and the 'staging' variable for mako to replace in your docker-compose.yml.in."
 	@echo "[mako_cmd] refers to the mako command. it is, usually, in your python virtual environment in $${python_directory}/bin/mako-render"
 	@echo "[image_base_name] will give a image_base_name variable for the mako render which will be swisstopo/[image_base_name]."
-	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example) could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
+	@echo "[additional variables] should be a string in the following form: --var "var_name=value" --var "var_name_2=value_2" etc. The goal is to provide all variables that are specific to your project.
+	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example,--var "test=operational" --var "functional=yes") could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
 	@echo "dockerrun: called with call dockerrun, [dev | int | prod], [mako_cmd], [image_base_name]"
 	@echo "Same function as dockerbuild, but it will run the images in containers."
 	@echo "dockerpurge : called with call dockerpurge, [image_name]"
@@ -25,45 +26,43 @@ define dockerhelp
 endef
 
 define dockerbuild
-	$(call docker-compose.yml,${1},false,${2},${3}) && $$(sudo docker-compose build)
+	$(call docker-compose.yml,${1},false,${2},${3},${4}) && sudo docker-compose build
 endef
 
 define dockerrun
-	$(call docker-compose.yml,${1},false,${2},${3}) && $$(sudo docker-compose up -d)
+	$(call docker-compose.yml,${1},false,${2},${3},${4}) && sudo docker-compose up -d
 endef
 
 define docker-clean
-	$$(sudo rm -f docker-compose.yml)
+	sudo rm -f docker-compose.yml
 endef
 
 
-#works, but TODO: find why it tries to run [bash container_id] in addition to docker rm
-# TODO 2 : find why it is trying to run Untagged in addtion to docker rmi
 define dockerpurge
-	echo "$$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}")"
 	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
 		if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then  \
-			$$(sudo docker rm -f "$$(sudo docker ps --filter "ancestor=$$line" -a -q)"); \
+			sudo docker rm -f "$$(sudo docker ps --filter "ancestor=$$line" -a -q)"; \
 		fi; \
-	$$(sudo docker rmi -f $$line); \
+	sudo docker rmi -f $$line; \
 	done
 endef
 
 
 define dockerpush
 	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" | grep ":${2}"); do \
-	$$(sudo docker push $$image);\
+	sudo docker push $$image;\
 	done
 endef
 
 #Okay, this is ugly, but it should work
+#         $(call dockerpush,"$$line_"$$(date +%Y_%m_%d)","")) ; \
+# nothing to see here
 
 define dockerpipe
 	$(call dockerpurge, ${3}) 
-	$(call dockerbuild, ${1}, ${2}, ${3})
+	$(call dockerbuild, ${1}, ${2}, ${3}, ${4})
 	for line in $$(sudo docker image --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}"); do \
-	$$(sudo docker tag $$line "$$line"_$$(date +%Y_%m_%d)) ; \
-	$(call dockerpush,"$$line_"$$(date +%Y_%m_%d)","")) ; \
+	sudo docker tag $$line "$$line"_$$(date +%Y_%m_%d) ; \
 	done ;
 endef
 
@@ -75,7 +74,7 @@ endef
 # docker-compose should be in your .env file. That way, we have a simple clean unique function. \
 # please ? 
 define docker-compose.yml
-	sudo echo "${3} | ${2} | ${1} | ${4}"
-        $$(sudo ${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "environment=${1}" --var "image_base_name=${4}" > docker-compose.yml)
+	sudo echo "${3} | ${2} | ${1} | ${4} | ${5}"
+        sudo ${3} docker-compose.yml.in --var "rancher_deploy=${2}" --var "environment=${1}" --var "image_base_name=${4}" ${5} > docker-compose.yml
 endef
 
