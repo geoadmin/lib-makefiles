@@ -49,20 +49,20 @@ endef
 
 
 define dockerpush
-	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}" | grep ":${2}"); do \
+	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep ${1} | grep :${2}); do \
+	echo $$image; \
 	sudo docker push $$image ; \
 	done
 endef
 
 #Okay, this is ugly, but it should work
-#         $(call dockerpush,"$$line_"$$(date +%Y_%m_%d)","")) ; 
-# nothing to see here
 
 define dockerpipe
 	$(call dockerpurge,${3}) 
 	$(call dockerbuild,${1},${2},${3},${4})
-	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${3}" | grep "${1}") ; do \
+	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep ${3} | grep ${1}) ; do \
 	sudo docker tag $$line "$$line"_$$(date +%Y_%m_%d) ; \
+	$(call dockerpush,"$$line_"$$(date +%Y_%m_%d),) ; \
 	done ;
 endef
 
