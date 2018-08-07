@@ -14,6 +14,7 @@ define dockerhelp
 	@echo "[mako_cmd] refers to the mako command. it is, usually, in your python virtual environment in $${python_directory}/bin/mako-render"
 	@echo "[image_base_name] will give a image_base_name variable for the mako render which will be swisstopo/[image_base_name]."
 	@echo "[additional variables] should be a string in the following form: --var 'var_name=value' --var 'var_name_2=value_2' etc. The goal is to provide all variables that are specific to your project. "
+	@echo "[additional variables] can also be used to build only specific images (for example: separating configuration images build from application images build) by adding the image names in the parameters or additional build options. For example (taken from proxywms current Makefile as I'm writing these lines): --no-cache service-proxywms-conf wms-bod "
 	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example,--var 'ci=true') could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
 	@echo "dockerrun: called with call dockerrun, [mako_cmd], [image_base_name],[dev | int | prod],  [additional variables]"
 	@echo "Same function as dockerbuild, but it will run the images in containers."
@@ -69,8 +70,8 @@ endef
 # $1 is the MAKO COMMAND and $4 is the base name of the image built \
 # $3 is the environment (dev, int, prod) and $2 is the variable that tells the docker compose if he \
 # is preparing to deploy to rancher.
-# $5 is composed of all variables used in the docker compose in the format 
-# --var "var_1=val_1" --var "var_2=val_2" --var "var_3=val_3"
+# $5 is composed of all variables used in the docker compose in the format followed by options and images names if you want to build only a few of them
+# --var "var_1=val_1" --var "var_2=val_2" --var "var_3=val_3 --no-cache service-example-config"
 
 define docker-compose.yml
         sudo ${1} docker-compose.yml.in --var "rancher_deploy=${2}" --var "image_base_name=${3}" --var "environment=${4}" ${5} > docker-compose.yml
