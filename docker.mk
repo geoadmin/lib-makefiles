@@ -42,6 +42,7 @@ endef
 define dockerpurge
 	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep "${1}"); do \
 		if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then  \
+			sudo echo "$$(sudo docker ps --filter "ancestor=$$line" -a --format "Removing : {{.Names}}")"
 			sudo docker rm -f "$$(sudo docker ps --filter "ancestor=$$line" -a -q)"; \
 		fi; \
 	sudo docker rmi -f $$line ; \
