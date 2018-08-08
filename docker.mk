@@ -9,21 +9,21 @@ Steo 3; Profit\
 define dockerhelp
 
 	@echo "The goal of this library is to provide functions to harmonize and ease the use of docker in the different swisstopo projects. This help should tell you how to use the different functions."
-	@echo "dockerbuild : called with call dockerbuild,[mako_cmd],[image_base_name], [dev|int|prod], [additional variables]"
-	@echo "[dev|int|prod] is the staging environment. it defines both the tag of the built image and the 'staging' variable for mako to replace in your docker-compose.yml.in."
+	@echo "dockerbuild : called with call dockerbuild,[mako_cmd],[image_base_name], [dev|int|prod| tiles], [additional variables]"
+	@echo "[dev|int|prod|tiles] is the staging environment. it defines both the tag of the built image and the 'staging' variable for mako to replace in your docker-compose.yml.in."
 	@echo "[mako_cmd] refers to the mako command. it is, usually, in your python virtual environment in $${python_directory}/bin/mako-render"
 	@echo "[image_base_name] will give a image_base_name variable for the mako render which will be swisstopo/[image_base_name]."
 	@echo "[additional variables] should be a string in the following form: --var 'var_name=value' --var 'var_name_2=value_2' etc. The goal is to provide all variables that are specific to your project. "
 	@echo "[additional variables] can also be used to build only specific images (for example: separating configuration images build from application images build) by adding the image names in the parameters or additional build options. For example (taken from proxywms current Makefile as I'm writing these lines): --no-cache service-proxywms-conf wms-bod "
 	@echo "Example of use : call dockerbuild, dev, .venv/bin/mako-render, service-example,--var 'ci=true') could build the swisstopo/service-example:dev and swisstopo/service-example-nginx:dev images"
-	@echo "dockerrun: called with call dockerrun, [mako_cmd], [image_base_name],[dev | int | prod],  [additional variables]"
+	@echo "dockerrun: called with call dockerrun, [mako_cmd], [image_base_name],[dev | int | prod | tiles],  [additional variables]"
 	@echo "Same function as dockerbuild, but it will run the images in containers."
 	@echo "dockerpurge : called with call dockerpurge, [image_name]"
 	@echo "it will remove all containers running and images whose image name"
 	@echo "are swisstopo/[image_name] with any tag."
 	@echo "dockerpush: called with call dockerpush, [image_name], [tag]"
 	@echo "will push to the swisstopo dockerhub the swisstopo/[image_name]:[tag] image."
-	@echo "dockerdeploy: called with call call dockerdeploy,[mako_cmd], [image_base_name], [dev | int | prod], [additional variables]"
+	@echo "dockerdeploy: called with call call dockerdeploy,[mako_cmd], [image_base_name], [dev | int | prod | tiles], [additional variables]"
 endef
 
 define dockerbuild
