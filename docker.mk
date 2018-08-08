@@ -34,7 +34,7 @@ define dockerrun
 	$(call docker-compose.yml,${1},false,${2},${3},${4}) && sudo docker-compose up -d
 endef
 
-define docker-clean
+define dockerclean
 	sudo rm -f docker-compose.yml
 endef
 

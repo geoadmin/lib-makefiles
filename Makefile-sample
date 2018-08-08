@@ -24,4 +24,4 @@ docker-pipe-%:
 	$(call dockerpipe,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
 
 clean:
-	rm -f docker-compose.yml
+	$(call dockerclean)
