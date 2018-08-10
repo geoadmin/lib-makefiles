@@ -8,11 +8,11 @@ help:
 	$(call dockerhelp)
 
 
-docker-buid-%:
-	$(call dockerbuild,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
+docker-build-%:
+	$(call dockerbuild,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2" --option })
 
 docker-run-%:
-	$(call dockerrun,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
+	$(call dockerrun,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2" --option })
 
 docker-purge:
 	$(call dockerpurge,${PROJECT_NAME})
@@ -21,7 +21,7 @@ docker-push-%:
 	$(call dockerpush,${PROJECT_NAME},$*)
 
 docker-pipe-%:
-	$(call dockerpipe,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2"})
+	$(call dockerpipe,${MAKO_CMD},${PROJECT_NAME},$*,--var "variable1=value1" --var "variable2=value2" --option})
 
 clean:
 	$(call dockerclean)
