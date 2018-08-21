@@ -27,11 +27,11 @@ define dockerhelp
 endef
 
 define dockerbuild
-	$(call docker-compose.yml,${1},false,${2},${3},${4}) && sudo docker-compose build
+	$(call docker-compose.yml,${1},false,${2},${3},${4},${5},${6}) && sudo docker-compose build
 endef
 
 define dockerrun
-	$(call docker-compose.yml,${1},false,${2},${3},${4}) && sudo docker-compose up -d
+	$(call docker-compose.yml,${1},false,${2},${3},${4},${5},${6}) && sudo docker-compose up -d
 endef
 
 define dockerclean
@@ -61,7 +61,7 @@ endef
 
 define dockerpipe
 	$(call dockerpurge,${2}) 
-	$(call dockerbuild,${1},${2},${3},${4})
+	$(call dockerbuild,${1},${2},${3},${4},${5},${6})
 	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "swisstopo" | grep ${2} | grep ${3}) ; do \
 	sudo docker tag $$line "$$line"_$$(date +%Y_%m_%d) ; \
 	$(call dockerpush,"$$line_"$$(date +%Y_%m_%d),) ; \
@@ -73,8 +73,16 @@ endef
 # is preparing to deploy to rancher.
 # $5 is composed of all variables used in the docker compose in the format followed by options and images names if you want to build only a few of them
 # --var "var_1=val_1" --var "var_2=val_2" --var "var_3=val_3 --no-cache service-example-config"
-
+#TODO: for loop to generate vars with $5, options with $6 and images with $7
 define docker-compose.yml
-        sudo ${1} docker-compose.yml.in --var "rancher_deploy=${2}" --var "image_base_name=${3}" --var "environment=${4}" ${5} > docker-compose.yml
+	variables ="" ;\
+	for variable in ${5} ; do \
+		variables = ${variables} --var "${variable}"; \
+	done; \
+	options = "" ;\
+	for option in ${6} ; do \
+		options = ${options} --${option} ; \
+	done ; \
+        sudo ${1} docker-compose.yml.in --var "rancher_deploy=${2}" --var "image_base_name=${3}" --var "environment=${4}" ${variables} ${options}  ${7} > docker-compose.yml \
 endef
 
