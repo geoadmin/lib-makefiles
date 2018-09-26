@@ -83,6 +83,6 @@ define docker-compose.yml
 	for option in ${6} ; do \
 		options = ${options} --${option} ; \
 	done ; \
-        sudo ${1} docker-compose.yml.in --var "rancher_deploy=${2}" --var "image_base_name=${3}" --var "environment=${4}" ${variables} ${options}  ${7} > docker-compose.yml \
+        sudo ${1} docker-compose.yml.in --var "rancher_deploy=${2}" --var "image_base_name=${3}" --var "environment=${4}" ${variables} ${options}  ${7} > docker-compose.yml 
 endef
 
