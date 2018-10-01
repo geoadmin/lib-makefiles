@@ -26,8 +26,9 @@ define dockerhelp
 	@echo "dockerdeploy: called with call call dockerdeploy,[mako_cmd], [image_base_name], [dev | int | prod | tiles], [additional variables]"
 endef
 
+#Will simply build the image, no fancy stuff.
 define dockerbuild
-	$(call docker-compose.yml,${1},false,${2},${3},${4},${5},${6}) && sudo docker-compose build
+	docker build -t ${2}:${3} ${1}
 endef
 
 define dockerrun
