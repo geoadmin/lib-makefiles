@@ -28,7 +28,7 @@ endef
 
 #Will simply build the image, no fancy stuff.
 define dockerbuild
-	docker build -t ${2}:${3} ${1}
+	docker build -t swisstopo/${2}:${3} ${1}
 endef
 
 define dockerrun
