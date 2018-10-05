@@ -55,7 +55,7 @@ define push
 endef
 
 define docker-compose.yml
-	echo "${2}" | echo "nope"
+	echo "${2}"
         sudo ${MAKO_CMD} ${2} ${1}/docker-compose.yml.in  > ${1}/docker-compose.yml
 endef
 
