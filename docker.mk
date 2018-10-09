@@ -25,7 +25,7 @@ endef
 
 define run
 	$(call docker-compose.yml,${1},$$(cat ${1}/${2}.arg))
-	echo "docker-compose up -f ${1}/docker-compose.yml -d"
+	docker-compose -f ${1}/docker-compose.yml up -d
 endef
 
 define clean
@@ -55,7 +55,7 @@ define push
 endef
 
 define docker-compose.yml
-	echo "${2}"
-        sudo ${MAKO_CMD} ${2} ${1}/docker-compose.yml.in  > ${1}/docker-compose.yml
+	echo ${2}; \
+	sudo ${MAKO_CMD} ${2} ${1}/docker-compose.yml.in  > ${1}/docker-compose.yml
 endef
 
