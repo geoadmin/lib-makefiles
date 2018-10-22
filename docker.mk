@@ -1,7 +1,7 @@
 SHELL = /bin/bash
-include ./integrity.mk
 # Author: Martin Kunzi\
 Using this library: \
+Step 0: include the integrity library inside your own make file.\
 Step 1: include the library inside your own make file.\
 Step 2: Call the desired functions \
 Steo 3; Profit\
