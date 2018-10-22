@@ -8,5 +8,5 @@ define guard
 endef
 
 define commit_tags
-	$(shell [ -z "`git status --porcelain`" ] && git rev-parse --short HEAD || echo "unstable")
+$(shell [ -z "`git status --porcelain`" ] && git rev-parse --short HEAD || echo "unstable")
 endef
