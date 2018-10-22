@@ -2,7 +2,6 @@ SHELL = /bin/bash
 
 PYTHON_DIR = .venv
 MAKO_CMD = ${PYTHON_DIR}/bin/mako-render
-PIP_CMD = ${PYTHON_DIR}/bin/pip
 
 # Author: Martin Kunzi\
 Using this library: \
@@ -16,8 +15,8 @@ define run
 	docker-compose -f ${1}/docker-compose.yml up -d
 endef
 
-define clean-%
-	echo "for on all files that end in .in, then rm those files without the .in"
+define composer-clean
+	rm ${1}/*.in
 endef
 
 define docker-compose.yml
