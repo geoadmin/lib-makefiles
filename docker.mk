@@ -24,7 +24,7 @@ define purge
 endef
 
 define push
-	$(call guard, ORGNAME)
+	$(call guard,ORGNAME)
 	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "${ORGNAME}" | grep ${1} | grep :${2}); do \
 	echo $$image; \
 	sudo docker push $$image ; \
