@@ -16,7 +16,7 @@ define run
 endef
 
 define composer-clean
-	rm ${1}/*.in
+	 rm ${1}/docker-compose.yml ${1}/rancher-compose.yml
 endef
 
 define docker-compose.yml
