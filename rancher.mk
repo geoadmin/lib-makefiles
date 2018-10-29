@@ -1,8 +1,8 @@
 SHELL = /bin/bash
 
 define rancherdeploy
-	$(call docker-compose.yml,${1}$$(cat ${1}/$(shell echo ${2} | tr A-Z a-z).arg))
-	$(call rancher-compose,${1}$$(cat ${1}/r$(shell echo ${2} | tr A-Z a-z).arg))
+	$(call docker-compose.yml,${1},$$(cat ${1}/$(shell echo ${2} | tr A-Z a-z).arg))
+	$(call rancher-compose,${1},$$(cat ${1}/r$(shell echo ${2} | tr A-Z a-z).arg))
 	$(call guard,RANCHER_ACCESS_KEY_${2})
 	$(call guard,RANCHER_SECRET_KEY_${2})
 	$(call guard,RANCHER_URL_${2})
