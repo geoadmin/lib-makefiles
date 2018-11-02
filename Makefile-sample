@@ -1,0 +1,27 @@
+include ./docker.mk
+SHELL:=/bin/bash
+VENV:=.venv
+MAKO_CMD:=${VENV}/bin/mako-render
+PROJECT_NAME:=sample_project_base_name
+
+help:
+	$(call dockerhelp)
+
+
+docker-build-%:
+	$(call dockerbuild,${MAKO_CMD},${PROJECT_NAME},$*, "variable1=value1" "variable2=value2", no-cache, })
+
+docker-run-%:
+	$(call dockerrun,${MAKO_CMD},${PROJECT_NAME},$*,"variable1=value1" "variable2=value2", no-cache, })
+
+docker-purge:
+	$(call dockerpurge,${PROJECT_NAME})
+
+docker-push-%:
+	$(call dockerpush,${PROJECT_NAME},$*)
+
+docker-pipe-%:
+	$(call dockerpipe,${MAKO_CMD},${PROJECT_NAME},$*,"variable1=value1" "variable2=value2", no-cache, })
+
+clean:
+	$(call dockerclean)
