@@ -14,20 +14,20 @@ endef
 
 define purge
 	$(call guard,ORGNAME)
-	for line in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "${ORGNAME}" | grep "${1}"); do \
-		if test "$$(sudo docker ps --filter "ancestor=$$line" -a -q)" != ""; then  \
-			sudo echo "$$(sudo docker ps --filter "ancestor=$$line" -a --format "Removing : {{.Names}}")" ; \
-			sudo docker rm -f "$$(sudo docker ps --filter "ancestor=$$line" -a -q)"; \
+	for line in $$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${ORGNAME}" | grep "${1}"); do \
+		if test "$$(docker ps --filter "ancestor=$$line" -a -q)" != ""; then  \
+			echo "$$(docker ps --filter "ancestor=$$line" -a --format "Removing : {{.Names}}")" ; \
+			docker rm -f "$$(docker ps --filter "ancestor=$$line" -a -q)"; \
 		fi; \
-	sudo docker rmi -f $$line ; \
+	docker rmi -f $$line ; \
 	done
 endef
 
 define push
 	$(call guard,ORGNAME)
-	for image in $$(sudo docker images --format "{{.Repository}}:{{.Tag}}" | grep "${ORGNAME}" | grep ${1} | grep :${2}); do \
+	for image in $$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${ORGNAME}" | grep ${1} | grep :${2}); do \
 	echo $$image; \
-	sudo docker push $$image ; \
+	docker push $$image ; \
 	done
 endef
 
