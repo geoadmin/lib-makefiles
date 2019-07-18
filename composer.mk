@@ -20,7 +20,7 @@ define composer-clean
 endef
 
 define docker-compose.yml
-	sudo ${MAKO_CMD} ${2} ${1}/docker-compose.yml.in  > ${1}/docker-compose.yml
+	${MAKO_CMD} ${2} ${1}/docker-compose.yml.in  > ${1}/docker-compose.yml
 endef
 
 # create env file logic : \
@@ -36,9 +36,9 @@ define create_env_file
         cred_file="credentials.arg"
 	if test "$$(ls -la ${1}/ | grep "${env_template}")" != ""; then \
 		if test "$$(ls -la ${1} | grep "${cred_staged_file}")" != ""; then \
-			sudo ${MAKO_CMD} ${cred_staged_file} ${1}/${env_template} > ${1}/${staging}.env \                
+			${MAKO_CMD} ${cred_staged_file} ${1}/${env_template} > ${1}/${staging}.env \                
 		elif test "$$(ls -la ${1} | grep "${cred_file}")" != ""; then \
-			sudo ${MAKO_CMD} ${cred_file} ${1}/${env_template} > ${1}/${staging}.env \
+			${MAKO_CMD} ${cred_file} ${1}/${env_template} > ${1}/${staging}.env \
 		else \
 			cp "${1}/${env_template}" "${1}/${2}.env" \
 		fi \
