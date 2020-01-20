@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
 PYTHON_DIR = .venv
-PIP_CMD = ${PYTHON_DIR}/bin/pip
+PIP_CMD = ${PYTHON_DIR}/bin/pip3
 
 # Author: Martin Kunzi\
 Using this library: \
@@ -13,7 +13,7 @@ Steo 3; Profit\
 define create_env
 	$(call clean)
 	if test "$$(ls -la | grep "venv")" == ""; then \
-		virtualenv ${PYTHON_DIR}; \
+		python3 -m venv ${PYTHON_DIR}; \
 		${PIP_CMD} install -r requirements.txt;\
 	fi
 endef
