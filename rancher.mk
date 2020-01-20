@@ -11,5 +11,5 @@ define rancherdeploy
 endef
 
 define rancher-compose
-	sudo ${MAKO_CMD} ${2} ${1}/rancher-compose.yml.in > ${1}/rancher-compose.yml
+	${MAKO_CMD} ${2} ${1}/rancher-compose.yml.in > ${1}/rancher-compose.yml
 endef
